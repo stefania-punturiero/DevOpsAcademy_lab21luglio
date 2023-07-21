@@ -1,0 +1,392 @@
+#output dovrà fornire l’endpoint del bilanciatore che andrà condiviso 
+#a certifica del completamento dell’esercizio
+
+AWSTemplateFormatVersion: '2010-09-09'
+Description: Template con le risorse - laboratorio 21/7
+
+Resources:
+
+  MyVPC:
+    Type: AWS::EC2::VPC
+    Properties:
+      CidrBlock: '10.0.0.0/16'
+      EnableDnsSupport: true
+      EnableDnsHostnames: true
+      Tags:
+        - Key: Name
+          Value: MyVPC
+        - Key: Nome
+          Value: Stefania
+        - Key: Cognome
+          Value: Punturiero
+        - Key: Environment
+          Value: DevOpsAcademy
+
+  MyInternetGateway:
+    Type: AWS::EC2::InternetGateway
+    Properties:
+      Tags:
+        - Key: Name
+          Value: MyInternetGateway
+        - Key: Nome
+          Value: Stefania
+        - Key: Cognome
+          Value: Punturiero
+        - Key: Environment
+          Value: DevOpsAcademy
+
+  MyVPCGatewayAttachment:
+    Type: AWS::EC2::VPCGatewayAttachment
+    Properties:
+      VpcId: !Ref MyVPC
+      InternetGatewayId: !Ref MyInternetGateway
+
+  MyPublicSubnet1:
+    Type: AWS::EC2::Subnet
+    Properties:
+      VpcId: !Ref MyVPC
+      CidrBlock: 10.0.1.0/24
+      MapPublicIpOnLaunch: True
+      AvailabilityZone: !Select 
+        - 0
+        - Fn::GetAZs: !Ref 'AWS::Region'
+      Tags:
+        - Key: Name
+          Value: MyPublicSubnet1
+        - Key: Nome
+          Value: Stefania
+        - Key: Cognome
+          Value: Punturiero
+        - Key: Environment
+          Value: DevOpsAcademy
+
+  MyPublicSubnet2:
+    Type: AWS::EC2::Subnet
+    Properties:
+      VpcId: !Ref MyVPC
+      CidrBlock: 10.0.2.0/24
+      MapPublicIpOnLaunch: True
+      AvailabilityZone: !Select 
+        - 1
+        - Fn::GetAZs: !Ref 'AWS::Region'
+      Tags:
+        - Key: Name
+          Value: MyPublicSubnet2
+        - Key: Nome
+          Value: Stefania
+        - Key: Cognome
+          Value: Punturiero
+        - Key: Environment
+          Value: DevOpsAcademy
+
+  MyNatGateway1EIP:
+    Type: AWS::EC2::EIP
+    Properties:
+      Domain: vpc
+
+  MyNatGateway2EIP:
+    Type: AWS::EC2::EIP
+    Properties:
+      Domain: vpc
+
+  MyNatGateway1:
+    Type: AWS::EC2::NatGateway
+    Properties:
+      SubnetId: !Ref MyPublicSubnet1
+      AllocationId: !GetAtt MyNatGateway1EIP.AllocationId
+      Tags:
+        - Key: Name
+          Value: MyNatGateway1
+        - Key: Nome
+          Value: Stefania
+        - Key: Cognome
+          Value: Punturiero
+        - Key: Environment
+          Value: DevOpsAcademy
+  
+  MyNatGateway2:
+    Type: AWS::EC2::NatGateway
+    Properties:
+      SubnetId: !Ref MyPublicSubnet2
+      AllocationId: !GetAtt MyNatGateway2EIP.AllocationId
+      Tags:
+        - Key: Name
+          Value: MyNatGateway2
+        - Key: Nome
+          Value: Stefania
+        - Key: Cognome
+          Value: Punturiero
+        - Key: Environment
+          Value: DevOpsAcademy
+
+  MyPrivateSubnet1:
+    Type: AWS::EC2::Subnet
+    Properties:
+      VpcId: !Ref MyVPC
+      CidrBlock: 10.0.3.0/24
+      AvailabilityZone: !Select 
+      - 0
+      - Fn::GetAZs: !Ref 'AWS::Region'
+      Tags:
+        - Key: Name
+          Value: MyPrivateSubnet1
+        - Key: Nome
+          Value: Stefania
+        - Key: Cognome
+          Value: Punturiero
+        - Key: Environment
+          Value: DevOpsAcademy
+
+  MyPrivateSubnet2:
+    Type: AWS::EC2::Subnet
+    Properties:
+      VpcId: !Ref MyVPC
+      CidrBlock: 10.0.4.0/24
+      AvailabilityZone: !Select 
+        - 1
+        - Fn::GetAZs: !Ref 'AWS::Region'
+      Tags:
+        - Key: Name
+          Value: MyPrivateSubnet2
+        - Key: Nome
+          Value: Stefania
+        - Key: Cognome
+          Value: Punturiero
+        - Key: Environment
+          Value: DevOpsAcademy
+
+
+  MyPublicRouteTable:
+    Type: AWS::EC2::RouteTable
+    Properties:
+      VpcId: !Ref MyVPC
+      Tags:
+        - Key: Name
+          Value: MyPublicRouteTable
+        - Key: Nome
+          Value: Stefania
+        - Key: Cognome
+          Value: Punturiero
+        - Key: Environment
+          Value: DevOpsAcademy
+
+  MyPublicRoute:
+    Type: AWS::EC2::Route
+    Properties:
+      RouteTableId: !Ref MyPublicRouteTable
+      DestinationCidrBlock: 0.0.0.0/0
+      GatewayId: !Ref MyInternetGateway
+
+  MyPublicSubnet1RouteTableAssociation:
+    Type: AWS::EC2::SubnetRouteTableAssociation
+    Properties:
+      SubnetId: !Ref MyPublicSubnet1
+      RouteTableId: !Ref MyPublicRouteTable
+
+  MyPublicSubnet2RouteTableAssociation:
+    Type: AWS::EC2::SubnetRouteTableAssociation
+    Properties:
+      SubnetId: !Ref MyPublicSubnet2
+      RouteTableId: !Ref MyPublicRouteTable
+
+  MyPrivateRouteTable1:
+    Type: AWS::EC2::RouteTable
+    Properties:
+      VpcId: !Ref MyVPC
+      Tags:
+        - Key: Name
+          Value: MyPrivateRouteTable1
+        - Key: Nome
+          Value: Stefania
+        - Key: Cognome
+          Value: Punturiero
+        - Key: Environment
+          Value: DevOpsAcademy
+
+  MyPrivateRoute1:
+    Type: AWS::EC2::Route
+    Properties:
+      RouteTableId: !Ref MyPrivateRouteTable1
+      DestinationCidrBlock: 0.0.0.0/0
+      NatGatewayId: !Ref MyNatGateway1
+
+  MyPrivateRouteTable2:
+    Type: AWS::EC2::RouteTable
+    Properties:
+      VpcId: !Ref MyVPC
+      Tags:
+        - Key: Name
+          Value: MyPrivateRouteTable2
+        - Key: Nome
+          Value: Stefania
+        - Key: Cognome
+          Value: Punturiero
+        - Key: Environment
+          Value: DevOpsAcademy
+
+  MyPrivateRoute2:
+    Type: AWS::EC2::Route
+    Properties:
+      RouteTableId: !Ref MyPrivateRouteTable2
+      DestinationCidrBlock: 0.0.0.0/0
+      NatGatewayId: !Ref MyNatGateway2
+  
+  MyPrivateSubnet1RouteTableAssociation:
+    Type: AWS::EC2::SubnetRouteTableAssociation
+    Properties:
+      SubnetId: !Ref MyPrivateSubnet1
+      RouteTableId: !Ref MyPrivateRouteTable1
+
+  MyPrivateSubnet2RouteTableAssociation:
+    Type: AWS::EC2::SubnetRouteTableAssociation
+    Properties:
+      SubnetId: !Ref MyPrivateSubnet2
+      RouteTableId: !Ref MyPrivateRouteTable2
+
+
+  EC2InstanceSecurityGroup:
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      GroupDescription: Security group per le istanze EC2
+      SecurityGroupIngress:
+        - IpProtocol: tcp
+          FromPort: '80'
+          ToPort: '80'
+          CidrIp: 0.0.0.0/0
+        - IpProtocol: tcp
+          FromPort: '22'
+          ToPort: '22'
+          CidrIp: 0.0.0.0/0
+      VpcId: !Ref MyVPC
+
+  LaunchConfiguration:
+    Type: AWS::AutoScaling::LaunchConfiguration
+    Properties:
+      ImageId: ami-0a31b1d679a45dda9
+      InstanceType: t2.micro
+      SecurityGroups:
+        - !Ref EC2InstanceSecurityGroup
+      UserData:
+        Fn::Base64: |
+          #!/bin/bash
+          yum update -y
+          yum install -y httpd php
+          service httpd start
+          echo "<?php echo 'Ciao Stefi!'; ?>" > /var/www/html/index.php
+          chkconfig httpd on
+
+  MyALB:
+    Type: AWS::ElasticLoadBalancingV2::LoadBalancer
+    Properties:
+      Name: MyALB
+      Scheme: internal
+      Type: application
+      Subnets:
+        - !Ref MyPrivateSubnet1
+        - !Ref MyPrivateSubnet2
+      LoadBalancerAttributes:
+        - Key: load_balancing.cross_zone.enabled
+          Value: 'true'
+      SecurityGroups:
+        - !Ref ALBSecurityGroup
+      Tags:
+          - Key: Name
+            Value: MyALB
+          - Key: Nome
+            Value: Stefania
+          - Key: Cognome
+            Value: Punturiero
+          - Key: Environment
+            Value: DevOpsAcademy
+
+  ALBSecurityGroup:
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      GroupDescription: Enable HTTP access via port 80
+      VpcId: !Ref MyVPC
+      SecurityGroupIngress:
+        - CidrIp: 0.0.0.0/0
+          IpProtocol: 'TCP'
+          FromPort: 80
+          ToPort: 80
+      Tags:
+          - Key: Name
+            Value: ALBSecurityGroup
+          - Key: Nome
+            Value: Stefania
+          - Key: Cognome
+            Value: Punturiero
+          - Key: Environment
+            Value: DevOpsAcademy
+
+  ALBListener:
+    Type: AWS::ElasticLoadBalancingV2::Listener
+    Properties:
+      LoadBalancerArn: !Ref MyALB
+      Protocol: HTTP
+      Port: 80
+      DefaultActions:
+        - Type: forward
+          TargetGroupArn: !Ref ALBTargetGroup
+      
+      
+  ALBListenerRule:
+    Type: AWS::ElasticLoadBalancingV2::ListenerRule
+    Properties:
+      ListenerArn: !Ref ALBListener
+      Priority: 1
+      Conditions:
+        - Field: path-pattern
+          Values:
+            - /
+      Actions:
+        - Type: forward
+          TargetGroupArn: !Ref ALBTargetGroup
+
+  ALBTargetGroup:
+    Type: AWS::ElasticLoadBalancingV2::TargetGroup
+    Properties:
+      Name: MyALBTargetGroup
+      Port: 80
+      Protocol: HTTP
+      VpcId: !Ref MyVPC
+      TargetType: instance
+      HealthCheckIntervalSeconds: 30
+      HealthCheckProtocol: HTTP
+      HealthCheckPort: '80'
+      HealthCheckPath: /index.php
+      HealthCheckTimeoutSeconds: 5
+      HealthyThresholdCount: 2
+      UnhealthyThresholdCount: 2
+
+
+  MyAutoScalingGroup:
+    Type: AWS::AutoScaling::AutoScalingGroup
+    Properties:
+      AutoScalingGroupName: MyAutoScalingGroup
+      MinSize: '1'
+      MaxSize: '6'
+      DesiredCapacity: '3'
+      HealthCheckGracePeriod: 300
+      LaunchConfigurationName: !Ref LaunchConfiguration
+      VPCZoneIdentifier:
+        - !Ref MyPrivateSubnet1
+        - !Ref MyPrivateSubnet2
+    
+      
+    
+Outputs:
+  VPCId:
+    Value: !Ref MyVPC
+  PublicSubnet1Id:
+    Value: !Ref MyPublicSubnet1
+  PublicSubnet2Id:
+    Value: !Ref MyPublicSubnet2
+  PrivateSubnet1Id:
+    Value: !Ref MyPrivateSubnet1
+  PrivateSubnet2Id:
+    Value: !Ref MyPrivateSubnet2
+  ALBEndpoint:
+    Description: Endpoint dell'Application Load Balancer
+    Value: !GetAtt MyALB.DNSName
+

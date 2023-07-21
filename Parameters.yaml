@@ -1,0 +1,33 @@
+
+Parameters:
+  VpcCidrBlock:
+    Description: Cidr Block della VPC
+    Type: String
+    Default: '10.0.0.0/16'
+
+  MyPublicSubnet1CidrBlock:
+    Description: Cidr Block della subnet pubblica 1
+    Type: String
+    Default: '10.0.1.0/24'
+
+  MyPublicSubnet2CidrBlock:
+    Description: Cidr Block della subnet pubblica 2
+    Type: String
+    Default: '10.0.2.0/24'
+
+  MyPrivateSubnet1CidrBlock:
+    Description: Cidr Block della subnet privata 1
+    Type: String
+    Default: '10.0.3.0/24'
+
+  MyPrivateSubnet2CidrBlock:
+    Description: Cidr Block della subnet privata 2
+    Type: String
+    Default: '10.0.4.0/24'
+
+  InstanceType:
+    Description: Tipo di istanza EC2
+    Type: String
+    Default: 't2.micro'
+
+  

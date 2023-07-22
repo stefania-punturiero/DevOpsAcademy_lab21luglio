@@ -2,11 +2,7 @@
 Creare una VPC e tutto il necessario perché si abbia un autoscaling group funzionante che operi su istanze EC2.
 Requisiti
 • Un utente IAM con privilegi sufficienti per gestire le istanze EC2, RDS, VPC, ALB e che 
-possa lanciare Cloudformation. Le credenziali di accesso dell'utente IAM sono
-o AK = AKIA4XYD6VE2IPDKU2WS
-o SK = wYaiO/D+8O8cMqIADS8f2nwfE6Foz+Vp28UCtzR4
-• Chiave SSH per le istanze EC2: DevOpsDemo 
-(16:73:56:21:d8:73:de:bf:37:0a:17:cb:25:fa:e9:bc:6f:fa:e9:ed)
+possa lanciare Cloudformation.
 • AWS CLI installata e configurata: 
 https://docs.aws.amazon.com/cli/latest/userguide/getting-startedquickstart.html#getting-started-quickstart-new-command
 • Usare i tags per taggare le proprie risorse (vedi esempio sezione 2), usare i seguenti
